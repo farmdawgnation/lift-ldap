@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package net.liftweb {
-package ldap {
+package net.liftweb.ldap
 
 import java.io.{InputStream, FileInputStream}
-import java.util.{Hashtable, Properties}
+import java.util.Properties
 
 import javax.naming.{AuthenticationException, CommunicationException, Context}
 import javax.naming.directory.{Attributes, SearchControls}
 import javax.naming.ldap.InitialLdapContext
 
 import scala.collection.mutable.ListBuffer
-import scala.collection.JavaConversions._
 
 import _root_.net.liftweb.util.{ControlHelpers, Props, SimpleInjector, ThreadGlobal}
 import _root_.net.liftweb.common.{Box, Empty, Full, Loggable}
@@ -57,7 +55,7 @@ object SimpleLDAPVendor extends LDAPVendor {
   }
 
   @deprecated("Use the configure() method")
-  def setupFromBoot = configure()
+  def setupFromBoot(): Unit = configure()
 }
 
 /**
@@ -313,7 +311,9 @@ class LDAPVendor extends Loggable with SimpleInjector {
   }
 
   protected def propertiesToMap(props: Properties) : Map[String,String] = {
-    Map.empty ++ props
+    val builder = Map.newBuilder[String, String]
+    props.forEach((k,v) => builder.addOne((k.toString, v.toString)))
+    builder.result()
   }
 
   // =========== Code ====================
@@ -444,6 +444,3 @@ class LDAPVendor extends Loggable with SimpleInjector {
     new InitialLdapContext(env, null)
   }
 }
-
-}} // Close nested packages
-
